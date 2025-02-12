@@ -1,3 +1,7 @@
+#Generates an entire distribution of PCs and NPCs for a single continent
+#Generates levels 20-16 first, as the top 5 levels most fully describe the feel of the continent
+#This feature outdates ClassBuildUp
+
 import random
 from openpyxl import Workbook
 from openpyxl import load_workbook
