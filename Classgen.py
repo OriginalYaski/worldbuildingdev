@@ -1,3 +1,7 @@
+#This file is for the purpose of generating a random number of champions of each class for the appropriate distribution of a single continent
+#In the 1.0 build, the order of the classes is fixed, and it can't be rearranged or have new classes added in
+#This is the first change desired in future iterations
+
 import random
 import math
 
