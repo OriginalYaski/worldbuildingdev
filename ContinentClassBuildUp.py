@@ -1,3 +1,6 @@
+#Generates an entire continent's worth of characters all at once
+#Outdated
+
 import random
 from openpyxl import Workbook
 from openpyxl import load_workbook
