@@ -5,6 +5,16 @@
 import random
 import math
 
+#------------------------------------------------------------------------
+
+def find_class(class_list, rand_list, r):
+    for i in range(len(rand_list)):
+        if (r <= rand_list[i]):
+            class_list[i] += 1
+            return class_list
+
+#------------------------------------------------------------------------
+
 loop = 1
 
 while loop == 1:
@@ -15,9 +25,12 @@ while loop == 1:
 
 if answer == "W":
     length = int(input("How long is the class list?\n"))
+    while length < 1:
+        length = int(input("You must input at least 1 class.\n"))
 
     print("List classes in order of least to most common")
 
+    randlist = [0] * length
     classes = [0] * length
 
     classlist = ["blank"] * length
@@ -25,64 +38,33 @@ if answer == "W":
     for i in range(length):
         classlist[i] = str(input("..."))
 else:
-    classes = [0] * 23
+    length = 23
+    randlist = [0] * length
+    classes = [0] * length
 
     classlist = ["Monk", "Psychic", "Inventor", "Gunslinger", "Cleric", "Oracle",
                  "Champion", "Druid", "Kineticist", "Barbarian", "Ranger", "Swashbuckler",
                  "Witch", "Fighter", "Rogue", "Thaumaturge", "Sorcerer", "Summoner",
                  "Investigator", "Bard", "Alchemist", "Magus", "Wizard"]
 
+randlist[0] = 3 ** (length - 1)
+
+for i in range(1, length):
+    randlist[i] = int(randlist[i-1] * 4/3)
+
+for i in range(1, length):
+    randlist[i] = randlist[i] + randlist[i-1]
+
+print(randlist)
+#print(randlist[length-1]+1)
+
 x = int(input("Number of iterations"))
 
 for i in range(x):
-    r = random.randrange(1,70274600998838)
+    r = random.randrange(1,randlist[length-1]+1)
 
-    if (r <= 31381059609):
-        classes[0] += 1
-    elif (r <= 73222472421):
-        classes[1] += 1
-    elif (r <= 129011022837):
-        classes[2] += 1
-    elif (r <= 203395756725):
-        classes[3] += 1
-    elif (r <= 302575401909):
-        classes[4] += 1
-    elif (r <= 434814928821):
-        classes[5] += 1
-    elif (r <= 611134298037):
-        classes[6] += 1
-    elif (r <= 846226790325):
-        classes[7] += 1
-    elif (r <= 1159683446709):
-        classes[8] += 1
-    elif (r <= 1577625655221):
-        classes[9] += 1
-    elif (r <= 2134881933237):
-        classes[10] += 1
-    elif (r <= 2877890303925):
-        classes[11] += 1
-    elif (r <= 3868568131509):
-        classes[12] += 1
-    elif (r <= 5189471901621):
-        classes[13] += 1
-    elif (r <= 6950676928437):
-        classes[14] += 1
-    elif (r <= 9298950297525):
-        classes[15] += 1
-    elif (r <= 12429981456309):
-        classes[16] += 1
-    elif (r <= 16604689668021):
-        classes[17] += 1
-    elif (r <= 22170967283637):
-        classes[18] += 1
-    elif (r <= 29592670771125):
-        classes[19] += 1
-    elif (r <= 39488275421109):
-        classes[20] += 1
-    elif (r <= 52682414954421):
-        classes[21] += 1
-    else:
-        classes[22] += 1
+    classes = find_class(classes, randlist, r)
+    
 
-for n in range(22, -1, -1):
+for n in range(len(classes)-1, -1, -1):
     print(classlist[n],": ",classes[n], sep = "")
