@@ -5,12 +5,32 @@
 import random
 import math
 
-classes = [0] * 23
+loop = 1
 
-classlist = ["Monk", "Psychic", "Inventor", "Gunslinger", "Cleric", "Oracle",
-             "Champion", "Druid", "Kineticist", "Barbarian", "Ranger", "Swashbuckler",
-             "Witch", "Fighter", "Rogue", "Thaumaturge", "Sorcerer", "Summoner",
-             "Investigator", "Bard", "Alchemist", "Magus", "Wizard"]
+while loop == 1:
+    answer = str(input("Read from File? (R) or Write own list? (W)\n"))
+    if answer == "R" or answer == "W":
+        break
+    print("Answer not recognized. ")
+
+if answer == "W":
+    length = int(input("How long is the class list?\n"))
+
+    print("List classes in order of least to most common")
+
+    classes = [0] * length
+
+    classlist = ["blank"] * length
+
+    for i in range(length):
+        classlist[i] = str(input("..."))
+else:
+    classes = [0] * 23
+
+    classlist = ["Monk", "Psychic", "Inventor", "Gunslinger", "Cleric", "Oracle",
+                 "Champion", "Druid", "Kineticist", "Barbarian", "Ranger", "Swashbuckler",
+                 "Witch", "Fighter", "Rogue", "Thaumaturge", "Sorcerer", "Summoner",
+                 "Investigator", "Bard", "Alchemist", "Magus", "Wizard"]
 
 x = int(input("Number of iterations"))
 
