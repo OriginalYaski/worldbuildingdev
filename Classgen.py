@@ -8,7 +8,7 @@ import math
 #------------------------------------------------------------------------
 
 def find_class(class_list, rand_list, r):
-    for i in range(len(rand_list)):
+    for i in range(len(rand_list)-1, -1, -1):
         if (r <= rand_list[i]):
             class_list[i] += 1
             return class_list
@@ -28,7 +28,7 @@ if answer == "W":
     while length < 1:
         length = int(input("You must input at least 1 class.\n"))
 
-    print("List classes in order of least to most common")
+    print("List classes in order of most to least common")
 
     randlist = [0] * length
     classes = [0] * length
@@ -42,18 +42,19 @@ else:
     randlist = [0] * length
     classes = [0] * length
 
-    classlist = ["Monk", "Psychic", "Inventor", "Gunslinger", "Cleric", "Oracle",
-                 "Champion", "Druid", "Kineticist", "Barbarian", "Ranger", "Swashbuckler",
-                 "Witch", "Fighter", "Rogue", "Thaumaturge", "Sorcerer", "Summoner",
-                 "Investigator", "Bard", "Alchemist", "Magus", "Wizard"]
+    classlist = ["Wizard", "Magus", "Alchemist", "Bard", "Investigator",
+                 "Summoner", "Sorcerer", "Thaumaturge", "Rogue", "Fighter", "Witch",
+                 "Swashbuckler", "Ranger", "Barbarian", "Kineticist", "Druid", "Champion",
+                 "Oracle", "Cleric", "Gunslinger", "Inventor", "Psychic", "Monk"]
 
-randlist[0] = 3 ** (length - 1)
+L = length - 1
+randlist[L] = 3 ** (L)
 
-for i in range(1, length):
-    randlist[i] = int(randlist[i-1] * 4/3)
+for i in range(L-1, -1, -1):
+    randlist[i] = int(randlist[i+1] * 4/3)
 
-for i in range(1, length):
-    randlist[i] = randlist[i] + randlist[i-1]
+for i in range(L-1, -1, -1):
+    randlist[i] = randlist[i] + randlist[i+1]
 
 print(randlist)
 #print(randlist[length-1]+1)
@@ -61,10 +62,10 @@ print(randlist)
 x = int(input("Number of iterations"))
 
 for i in range(x):
-    r = random.randrange(1,randlist[length-1]+1)
+    r = random.randrange(1,randlist[0]+1)
 
     classes = find_class(classes, randlist, r)
     
 
-for n in range(len(classes)-1, -1, -1):
+for n in range(len(classes)):
     print(classlist[n],": ",classes[n], sep = "")
