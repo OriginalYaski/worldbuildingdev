@@ -7,7 +7,7 @@ from openpyxl import Workbook
 from openpyxl import load_workbook
 
 #for the progress display
-CURRENT_PERCENT = 0
+#CURRENT_PERCENT = 0
 
 #------------------------------------------------------------------------
 
@@ -106,24 +106,21 @@ def generate_level(current, Adults, PCs, total, tracker):
 #------------------------------------------------------------------------
 
 #function to generate levels 20-16 as a dictionary
-def the_first_five(Adults, PCs, current, ws, class_list):
+def the_first_five(Adults, PCs, current, ws):
 
 #Grab the per level sum totals of the PC and general populations
     PC_tracker = [ws.cell(row = i, column = 24).value for i in range(1,21)]
-    total_tracker = [ws.cell(row = i, column = 25).value for i in range(1,21)]
+    total_tracker = [ws.cell(row = i, column = 25).value for i in range(20,0,-1)]
 
 #instantiate the dictionary
     demographics = {}
-#instantiate the list pointer
-    x = 0
 
     while current > 15:
         #loop through each level
         Adults, PCs, demographics[current] = generate_level(current, Adults, PCs,
                                                total_tracker[x], PC_tracker)
 
-#increment the pointers
-        x += 1
+#increment the pointer
         current -= 1
 #return results
     return [Adults, PCs, current, PC_tracker, total_tracker, demographics]
@@ -132,16 +129,13 @@ def the_first_five(Adults, PCs, current, ws, class_list):
 
 #function to generate levels 15-1 and add them to the dictionary
 def the_rest(Adults, PCs, current, PC_tracker, total_tracker, demographic):
-#instantiate the list pointer
-    x = 5
-
+    
     while current > 0:
         #loop through each level
         Adults, PCs, demographic[current] = generate_level(current, Adults, PCs,
                                                total_tracker[x], PC_tracker)
 
-#increment the pointers
-        x += 1
+#increment the pointer
         current -= 1
 #return finished dictionary
     return demographic
@@ -149,9 +143,9 @@ def the_rest(Adults, PCs, current, PC_tracker, total_tracker, demographic):
 #------------------------------------------------------------------------
 
 #todo make it accept variable user input
-wb = load_workbook('C:/Users/infin/OneDrive/Documents/The big organizer.xlsx')
+wb = load_workbook('The new organizer.xlsx')
 
-ws = wb['Noromar big sheet 1']
+ws = wb['Big sheet 1']
 
 #get the list of class priority
 PC_class_list = [ws.cell(row = 21, column = i).value for i in range(1,24)]
@@ -172,7 +166,7 @@ while isgood == 0:
 
     #levels 20-16 can be generated quickly, and have the highest variance
     #offer a breakpoint to see if those levels are satisfactory, and reroll them if desired
-    outputlist = the_first_five(ws['AA2'], ws['AA1'], 20, ws, PC_class_list)
+    outputlist = the_first_five(ws['AA2'].value, ws['AA1'].value, 20, ws)
 
     #print(outputlist[5])
 

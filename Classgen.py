@@ -2,6 +2,7 @@
 #In the 1.0 build, the order of the classes is fixed, and it can't be rearranged or have new classes added in
 #This is the first change desired in future iterations
 
+from openpyxl import Workbook
 import random
 import math
 
@@ -47,6 +48,9 @@ else:
                  "Swashbuckler", "Ranger", "Barbarian", "Kineticist", "Druid", "Champion",
                  "Oracle", "Cleric", "Gunslinger", "Inventor", "Psychic", "Monk"]
 
+wb = Workbook()
+ws = wb.create_sheet('Big sheet 1')
+
 L = length - 1
 randlist[L] = 3 ** (L)
 
@@ -56,16 +60,41 @@ for i in range(L-1, -1, -1):
 for i in range(L-1, -1, -1):
     randlist[i] = randlist[i] + randlist[i+1]
 
-print(randlist)
+#Used for calibration/confirmation of proper randlist setup (Optional)
+#print(randlist)
 #print(randlist[length-1]+1)
 
-x = int(input("Number of iterations"))
 
+
+answer = str(input("Use default setup?"))
+if answer == "Y":
+    x = 5120000
+    y = 640000000
+#This needs to be fleshed out
+else:
+    x = int(input("Number of iterations"))
+    #Need to give controls on ratio of adults to exalted, etc., but I'm hardcoding for now
+    y = 640000000
+
+#Store the size of the class matrix
+ws['A1'].value = length
+
+#Store the total PCs, total Adults, and total NPCs (respectively)
+ws.cell(row = 1, column = length + 5, value = x)
+ws.cell(row = 2, column = length + 5, value = y)
+ws.cell(row = 3, column = length + 5, value = y-x)
+
+#Generate all the PCs by class, randomly
 for i in range(x):
     r = random.randrange(1,randlist[0]+1)
 
     classes = find_class(classes, randlist, r)
     
-
+#Print and store all the PCs by class
 for n in range(len(classes)):
+    ws.cell(row = 21, column = n+2, value = classlist[n])
+    ws.cell(row = 22, column = n+2, value = classes[n])
     print(classlist[n],": ",classes[n], sep = "")
+
+wb.save('The new organizer.xlsx')
+wb.close()
