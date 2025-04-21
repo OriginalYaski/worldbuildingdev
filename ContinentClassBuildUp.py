@@ -129,9 +129,9 @@ def dict_make(NPCs, ws, class_list):
 #------------------------------------------------------------------------
 
 #todo make it accept variable user input
-wb = load_workbook('C:/Users/infin/OneDrive/Documents/The big organizer.xlsx')
+wb = load_workbook('The new organizer.xlsx')
 
-ws = wb['Noromar big sheet 1']
+ws = wb['Big sheet 1']
 
 #get the list of class priority
 PC_class_list = [ws.cell(row = 21, column = i).value for i in range(1,24)]
