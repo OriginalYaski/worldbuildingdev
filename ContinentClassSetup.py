@@ -7,7 +7,7 @@ from openpyxl import Workbook
 from openpyxl import load_workbook
 
 #for the progress display
-CURRENT_PERCENT = 0
+#CURRENT_PERCENT = 0
 
 #------------------------------------------------------------------------
 
@@ -149,7 +149,7 @@ def the_rest(Adults, PCs, current, PC_tracker, total_tracker, demographic):
 #------------------------------------------------------------------------
 
 #todo make it accept variable user input
-wb = load_workbook('C:/Users/infin/OneDrive/Documents/The big organizer.xlsx')
+wb = load_workbook('The big organizer.xlsx')
 
 ws = wb['Noromar big sheet 1']
 
@@ -172,7 +172,7 @@ while isgood == 0:
 
     #levels 20-16 can be generated quickly, and have the highest variance
     #offer a breakpoint to see if those levels are satisfactory, and reroll them if desired
-    outputlist = the_first_five(ws['AA2'], ws['AA1'], 20, ws, PC_class_list)
+    outputlist = the_first_five(ws['AA2'].value, ws['AA1'].value, 20, ws, PC_class_list)
 
     #print(outputlist[5])
 
