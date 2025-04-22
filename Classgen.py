@@ -39,14 +39,15 @@ if answer == "W":
     for i in range(length):
         classlist[i] = str(input("..."))
 else:
-    length = 23
+    length = 25
     randlist = [0] * length
     classes = [0] * length
 
     classlist = ["Wizard", "Magus", "Alchemist", "Bard", "Investigator",
                  "Summoner", "Sorcerer", "Thaumaturge", "Rogue", "Fighter", "Witch",
                  "Swashbuckler", "Ranger", "Barbarian", "Kineticist", "Druid", "Champion",
-                 "Oracle", "Cleric", "Gunslinger", "Inventor", "Psychic", "Monk"]
+                 "Oracle", "Animist", "Cleric", "Gunslinger", "Inventor", "Psychic",
+                 "Monk", "Exemplar"]
 
 wb = Workbook()
 ws = wb.create_sheet('Big sheet 1')

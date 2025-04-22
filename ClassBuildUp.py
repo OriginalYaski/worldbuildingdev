@@ -153,10 +153,6 @@ Adult_total = ws.cell(row = 2, column = mark + 4).value
 PC_lvl_list = total_lists(ws, PC_total, mark+1, 169, 5)
 Total_lvl_list = total_lists(ws, Adult_total, mark+2, 169, 5)
 
-#generate the class distribution array
-level_array = {}
-level_key = 1
-
 #create a flag for when we've found an acceptable output
 isgood = 0
 
@@ -187,6 +183,11 @@ total_list = outputlist[1]
 total_demographics = outputlist[2]
 
 total_demographics = the_rest(PC_total, total_list, total_demographics)
+
+#Save the results to the excel doc
+for r in range(1,21):
+    for c in range(0,mark-1):
+        ws.cell(row = 21-r, column = c+2, value = total_demographics[r][c])
 
 wb.save('The new organizer.xlsx')
 wb.close()
