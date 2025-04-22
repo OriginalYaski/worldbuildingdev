@@ -44,7 +44,7 @@ def total_lists(sheet, total, col, falloff, scale):
 #method to generate 1 level of the dictionary
 def generate_level(current, total, total_list, PCs):
 #generate the level list
-    level_list = [0,]*(mark-1)
+    level_list = [0]*(mark-1)
 
 #run until the level is full
     while PCs > 0:
@@ -94,11 +94,6 @@ def the_first_ten():
     total = ws.cell(row = 1, column = mark + 4).value
     PC_total_list = [ws.cell(row = 22, column = i).value for i in range(2,mark+1)]
 
-    s = 0
-    for i in range(0, mark-1):
-        s += PC_total_list[i]
-
-    print(s)
 #instantiate the dictionary
     demographics = {}
 #instantiate the list pointer
@@ -138,7 +133,7 @@ wb = load_workbook('The new organizer.xlsx')
 
 ws = wb['Big sheet 1']
 
-#Get the enpoint of the list
+#Get the endpoint of the list
 global mark
 mark = ws['A1'].value + 1
 
@@ -162,8 +157,7 @@ while isgood == 0:
     #offer a breakpoint to see if those levels are satisfactory, and reroll them if desired
     outputlist = the_first_ten()
 
-    #print(outputlist[5])
-    print(outputlist[0])
+    #print(outputlist[0])
 
     response = input('Is this acceptable? (Y/N):')
 

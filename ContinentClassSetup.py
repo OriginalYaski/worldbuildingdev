@@ -3,6 +3,7 @@
 #This feature outdates ClassBuildUp
 
 import random
+import copy
 from openpyxl import Workbook
 from openpyxl import load_workbook
 
@@ -40,7 +41,7 @@ def find_PC(PCs, current, roll, level, pc_list):
 #choose a random PC from a given level
 def grab_PC(current, roll, level, total):
 #iterate through the various classes of that level
-    for cell_pointer in range(0,23):
+    for cell_pointer in range(0,mark-1):
 #add the number of PCs of that class to the current score
         roll += level_array[current][cell_pointer]
 #if threshold is passed, choose one of the PCs of that class
@@ -105,20 +106,20 @@ def generate_level(current, Adults, PCs, total, tracker):
 
 #------------------------------------------------------------------------
 
-#function to generate levels 20-16 as a dictionary
-def the_first_five(Adults, PCs, current, ws):
+#function to generate levels 20-11 as a dictionary
+def the_first_ten(Adults, PCs, current, ws):
 
 #Grab the per level sum totals of the PC and general populations
-    PC_tracker = [ws.cell(row = i, column = 24).value for i in range(1,21)]
-    total_tracker = [ws.cell(row = i, column = 25).value for i in range(20,0,-1)]
+    PC_tracker = [ws.cell(row = i, column = mark+1).value for i in range(1,21)]
+    total_tracker = [ws.cell(row = i, column = mark+2).value for i in range(20,0,-1)]
 
 #instantiate the dictionary
     demographics = {}
 
-    while current > 15:
+    while current > 10:
         #loop through each level
         Adults, PCs, demographics[current] = generate_level(current, Adults, PCs,
-                                               total_tracker[x], PC_tracker)
+                                               total_tracker[current-1], PC_tracker)
 
 #increment the pointer
         current -= 1
@@ -133,7 +134,7 @@ def the_rest(Adults, PCs, current, PC_tracker, total_tracker, demographic):
     while current > 0:
         #loop through each level
         Adults, PCs, demographic[current] = generate_level(current, Adults, PCs,
-                                               total_tracker[x], PC_tracker)
+                                               total_tracker[current-1], PC_tracker)
 
 #increment the pointer
         current -= 1
@@ -145,30 +146,45 @@ def the_rest(Adults, PCs, current, PC_tracker, total_tracker, demographic):
 #todo make it accept variable user input
 wb = load_workbook('The new organizer.xlsx')
 
-ws = wb['Big sheet 1']
+ws1 = wb['Big sheet 1']
+
+#Get the endpoint of the list
+global mark
+mark = ws1['A1'].value + 1
 
 #get the list of class priority
-PC_class_list = [ws.cell(row = 21, column = i).value for i in range(1,24)]
+PC_class_list = [ws1.cell(row = 21, column = i).value for i in range(2,mark+1)]
+
+#Get the totals
+PC_total = ws1.cell(row = 1, column = mark + 4).value
+Adult_total = ws1.cell(row = 2, column = mark + 4).value
+
 #acquire the class distribution array
-level_array = {}
-level_key = 15
+master_level_array = {}
+level_key = 20
 
 #iterate through the array
-for row in ws.iter_rows(min_row = 6, max_row = 20, max_col = 23, values_only=True):
+for row in ws1.iter_rows(min_row = 1, max_row = 20,
+                         min_col = 2, max_col = mark, values_only=True):
     #row default returns a tuple, so convert to list for future manipulation
-    level_array[level_key] = list(row)
+    master_level_array[level_key] = list(row)
     level_key -=1
 
 #create a flag for when we've found an acceptable output
 isgood = 0
 
 while isgood == 0:
+#Create dummy values to pass, so the globals don't get modified
+    PCs = PC_total
+    Adults = Adult_total
+    level_array = copy.deepcopy(master_level_array)
+    
 
-    #levels 20-16 can be generated quickly, and have the highest variance
+    #levels 20-11 can be generated quickly, and have the highest variance
     #offer a breakpoint to see if those levels are satisfactory, and reroll them if desired
-    outputlist = the_first_five(ws['AA2'].value, ws['AA1'].value, 20, ws)
+    outputlist = the_first_ten(Adults, PCs, 20, ws1)
 
-    #print(outputlist[5])
+    print(outputlist[0])
 
     response = input('Is this acceptable? (Y/N):')
 
@@ -196,5 +212,7 @@ total_demographics = the_rest(Adult_total, PC_total, Current_level, PC_level_tra
 #to do, make it output automatically to either an excel sheet or a txt file
 #for x in total_demographics.keys():
 #    print(total_demographics[x])
+#ws2 = wb.create_sheet['Big sheet 2']
 
+wb.save('The new organizer.xlsx')
 wb.close()
