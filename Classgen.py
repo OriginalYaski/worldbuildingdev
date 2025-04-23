@@ -16,86 +16,96 @@ def find_class(class_list, rand_list, r):
 
 #------------------------------------------------------------------------
 
-loop = 1
+def main():
+    loop = 1
 
-while loop == 1:
-    answer = str(input("Read from File? (R) or Write own list? (W)\n"))
-    if answer == "R" or answer == "W":
-        break
-    print("Answer not recognized. ")
+    while loop == 1:
+        answer = str(input("Read from File? (R) or Write own list? (W)\n"))
+        if answer == "Cancel":
+            print("Cancelling...")
+            return "Cancel"
+        elif answer == "R" or answer == "W":
+            break
+        print("Answer not recognized. ")
 
-if answer == "W":
-    length = int(input("How long is the class list?\n"))
-    while length < 1:
-        length = int(input("You must input at least 1 class.\n"))
+    if answer == "W":
+        length = int(input("How long is the class list?\n"))
+        while length < 1:
+            length = int(input("You must input at least 1 class.\n"))
 
-    print("List classes in order of most to least common")
+        print("List classes in order of most to least common")
 
-    randlist = [0] * length
-    classes = [0] * length
+        randlist = [0] * length
+        classes = [0] * length
 
-    classlist = ["blank"] * length
+        classlist = ["blank"] * length
 
-    for i in range(length):
-        classlist[i] = str(input("..."))
-else:
-    length = 25
-    randlist = [0] * length
-    classes = [0] * length
+        for i in range(length):
+            classlist[i] = str(input("..."))
+    else:
+        length = 25
+        randlist = [0] * length
+        classes = [0] * length
 
-    classlist = ["Wizard", "Magus", "Alchemist", "Bard", "Investigator",
-                 "Summoner", "Sorcerer", "Thaumaturge", "Rogue", "Fighter", "Witch",
-                 "Swashbuckler", "Ranger", "Barbarian", "Kineticist", "Druid", "Champion",
-                 "Oracle", "Animist", "Cleric", "Gunslinger", "Inventor", "Psychic",
-                 "Monk", "Exemplar"]
+        classlist = ["Wizard", "Magus", "Alchemist", "Bard", "Investigator",
+                     "Summoner", "Sorcerer", "Thaumaturge", "Rogue", "Fighter", "Witch",
+                     "Swashbuckler", "Ranger", "Barbarian", "Kineticist", "Druid", "Champion",
+                     "Oracle", "Animist", "Cleric", "Gunslinger", "Inventor", "Psychic",
+                     "Monk", "Exemplar"]
 
-wb = Workbook()
-ws = wb.create_sheet('Big sheet 1')
+    wb = Workbook()
+    ws = wb.create_sheet('Big sheet 1')
 
-L = length - 1
-randlist[L] = 3 ** (L)
+    L = length - 1
+    randlist[L] = 3 ** (L)
 
-for i in range(L-1, -1, -1):
-    randlist[i] = int(randlist[i+1] * 4/3)
+    for i in range(L-1, -1, -1):
+        randlist[i] = int(randlist[i+1] * 4/3)
 
-for i in range(L-1, -1, -1):
-    randlist[i] = randlist[i] + randlist[i+1]
+    for i in range(L-1, -1, -1):
+        randlist[i] = randlist[i] + randlist[i+1]
 
-#Used for calibration/confirmation of proper randlist setup (Optional)
-#print(randlist)
-#print(randlist[length-1]+1)
+    #Used for calibration/confirmation of proper randlist setup (Optional)
+    #print(randlist)
+    #print(randlist[length-1]+1)
 
 
 
-answer = str(input("Use default setup?"))
-if answer == "Y":
-    x = 5120000
-    y = 640000000
-#This needs to be fleshed out
-else:
-    x = int(input("Number of iterations"))
-    #Need to give controls on ratio of adults to exalted, etc., but I'm hardcoding for now
-    y = 640000000
+    answer = str(input("Use default setup?"))
+    if answer == "Cancel":
+        print("Cancelling...")
+        return "Cancel"
+    elif answer == "Y":
+        x = 5120000
+        y = 640000000
+    #This needs to be fleshed out
+    else:
+        x = int(input("Number of iterations"))
+        #Need to give controls on ratio of adults to exalted, etc., but I'm hardcoding for now
+        y = 640000000
 
-#Store the size of the class matrix
-ws['A1'].value = length
+    #Store the size of the class matrix
+    ws['A1'].value = length
 
-#Store the total PCs, total Adults, and total NPCs (respectively)
-ws.cell(row = 1, column = length + 5, value = x)
-ws.cell(row = 2, column = length + 5, value = y)
-ws.cell(row = 3, column = length + 5, value = y-x)
+    #Store the total PCs, total Adults, and total NPCs (respectively)
+    ws.cell(row = 1, column = length + 5, value = x)
+    ws.cell(row = 2, column = length + 5, value = y)
+    ws.cell(row = 3, column = length + 5, value = y-x)
 
-#Generate all the PCs by class, randomly
-for i in range(x):
-    r = random.randrange(1,randlist[0]+1)
+    #Generate all the PCs by class, randomly
+    for i in range(x):
+        r = random.randrange(1,randlist[0]+1)
 
-    classes = find_class(classes, randlist, r)
-    
-#Print and store all the PCs by class
-for n in range(len(classes)):
-    ws.cell(row = 21, column = n+2, value = classlist[n])
-    ws.cell(row = 22, column = n+2, value = classes[n])
-    print(classlist[n],": ",classes[n], sep = "")
+        classes = find_class(classes, randlist, r)
+        
+    #Print and store all the PCs by class
+    for n in range(len(classes)):
+        ws.cell(row = 21, column = n+2, value = classlist[n])
+        ws.cell(row = 22, column = n+2, value = classes[n])
+        print(classlist[n],": ",classes[n], sep = "")
 
-wb.save('The new organizer.xlsx')
-wb.close()
+    filename = str(input("Name the Excel file to save to:"))
+    wb.save(filename + '.xlsx')
+    wb.close()
+
+    return filename

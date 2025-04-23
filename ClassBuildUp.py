@@ -128,61 +128,75 @@ def the_rest(total, PC_total_list, demographics):
     
 #------------------------------------------------------------------------
 
-#todo make it accept variable user input
-wb = load_workbook('The new organizer.xlsx')
+def main(filename):
+#load file
+    wb = load_workbook(filename + '.xlsx')
 
-ws = wb['Big sheet 1']
+    global ws
+    ws = wb['Big sheet 1']
 
-#Get the endpoint of the list
-global mark
-mark = ws['A1'].value + 1
+    #Get the endpoint of the list
+    global mark
+    mark = ws['A1'].value + 1
 
-#get the list of class priority
-PC_class_list = [ws.cell(row = 21, column = i).value for i in range(2,mark+1)]
+    #get the list of class priority
+    global PC_class_list
+    PC_class_list = [ws.cell(row = 21, column = i).value for i in range(2,mark+1)]
 
-#Get the totals
-PC_total = ws.cell(row = 1, column = mark + 4).value
-Adult_total = ws.cell(row = 2, column = mark + 4).value
+    #Get the totals
+    PC_total = ws.cell(row = 1, column = mark + 4).value
+    Adult_total = ws.cell(row = 2, column = mark + 4).value
 
-#Setup the PC and total level distributions
-PC_lvl_list = total_lists(ws, PC_total, mark+1, 169, 5)
-Total_lvl_list = total_lists(ws, Adult_total, mark+2, 169, 5)
+    #Setup the PC and total level distributions
+    global PC_lvl_list, Total_lvl_list
+    PC_lvl_list = total_lists(ws, PC_total, mark+1, 169, 5)
+    Total_lvl_list = total_lists(ws, Adult_total, mark+2, 169, 5)
 
-#create a flag for when we've found an acceptable output
-isgood = 0
+    #create a flag for when we've found an acceptable output
+    isgood = 0
 
-while isgood == 0:
+    while isgood == 0:
 
-    #levels 20-16 can be generated quickly, and have the highest variance
-    #offer a breakpoint to see if those levels are satisfactory, and reroll them if desired
-    outputlist = the_first_ten()
+        #levels 20-16 can be generated quickly, and have the highest variance
+        #offer a breakpoint to see if those levels are satisfactory, and reroll them if desired
+        outputlist = the_first_ten()
 
-    #print(outputlist[0])
+        #print(outputlist[0])
 
-    response = input('Is this acceptable? (Y/N):')
+        response = input('Is this acceptable? (Y/N):')
 
-#filter out unrecognized commands
-    while response != 'Y' and response != 'N':
-        response = input('Response not recognized, please enter Y or N:')
+        if response == "Cancel":
+            print("Cancelling...")
+            return "Cancel"
 
-    if response == 'Y':
-        print('Continuing...\n')
-        isgood = 1
-    else:
-        print('Rerolling...\n')
+    #filter out unrecognized commands
+        while response != 'Y' and response != 'N':
+            response = input('Response not recognized, please enter Y or N:')
 
-#receive the outputs from after the first 10 levels are calculated
-PC_total = outputlist[0]
-total_list = outputlist[1]
-total_demographics = outputlist[2]
+            if response == "Cancel":
+                print("Cancelling...")
+                return "Cancel"
 
-total_demographics = the_rest(PC_total, total_list, total_demographics)
+        if response == 'Y':
+            print('Continuing...\n')
+            isgood = 1
+        else:
+            print('Rerolling...\n')
 
-#Save the results to the excel doc
-for r in range(1,21):
-    for c in range(0,mark-1):
-        if total_demographics[r][c] != 0:
-            ws.cell(row = 21-r, column = c+2, value = total_demographics[r][c])
+    #receive the outputs from after the first 10 levels are calculated
+    PC_total = outputlist[0]
+    total_list = outputlist[1]
+    total_demographics = outputlist[2]
 
-wb.save('The new organizer.xlsx')
-wb.close()
+    total_demographics = the_rest(PC_total, total_list, total_demographics)
+
+    #Save the results to the excel doc
+    for r in range(1,21):
+        for c in range(0,mark-1):
+            if total_demographics[r][c] != 0:
+                ws.cell(row = 21-r, column = c+2, value = total_demographics[r][c])
+
+    wb.save(filename + '.xlsx')
+    wb.close()
+
+    return "Good"

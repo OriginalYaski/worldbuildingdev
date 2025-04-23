@@ -10,6 +10,7 @@ from openpyxl import load_workbook
 #for the progress display
 #CURRENT_PERCENT = 0
 
+
 #------------------------------------------------------------------------
 
 #choose a random level of PC
@@ -177,104 +178,111 @@ def the_rest(Adults, PCs, current, PC_tracker, total_tracker, demographic):
     
 #------------------------------------------------------------------------
 
-#todo make it accept variable user input
-wb = load_workbook('The new organizer.xlsx')
+def main(filename):
 
-ws1 = wb['Big sheet 1']
+    wb = load_workbook(filename + '.xlsx')
 
-#Get the endpoint of the list
-global mark
-mark = int(ws1['A1'].value + 1)
+    ws1 = wb['Big sheet 1']
 
-#get the list of class priority
-PC_class_list = [ws1.cell(row = 21, column = i).value for i in range(2,mark+1)]
-PC_class_list += ["NPCs"]
-print(PC_class_list)
+    #Get the endpoint of the list
+    global mark
+    mark = int(ws1['A1'].value + 1)
 
-#Get the totals
-PC_total = int(ws1.cell(row = 1, column = mark + 4).value)
-Adult_total = int(ws1.cell(row = 2, column = mark + 4).value)
+    #get the list of class priority
+    global PC_class_list
+    PC_class_list = [ws1.cell(row = 21, column = i).value for i in range(2,mark+1)]
+    PC_class_list += ["NPCs"]
+    print(PC_class_list)
 
-#acquire the class distribution array
-master_level_array = {}
-level_key = 20
+    #Get the totals
+    PC_total = int(ws1.cell(row = 1, column = mark + 4).value)
+    Adult_total = int(ws1.cell(row = 2, column = mark + 4).value)
 
-#iterate through the array
-for row in ws1.iter_rows(min_row = 1, max_row = 20,
-                         min_col = 2, max_col = mark, values_only=True):
-    #row default returns a tuple, so convert to list for future manipulation
-    master_level_array[level_key] = list(row)
-    level_key -=1
+    #acquire the class distribution array
+    master_level_array = {}
+    global level_array
+    level_key = 20
 
-#create a flag for when we've found an acceptable output
-isgood = 0
+    #iterate through the array
+    for row in ws1.iter_rows(min_row = 1, max_row = 20,
+                             min_col = 2, max_col = mark, values_only=True):
+        #row default returns a tuple, so convert to list for future manipulation
+        master_level_array[level_key] = list(row)
+        level_key -=1
 
-while isgood == 0:
-#Create dummy values to pass, so the globals don't get modified
-    PCs = PC_total
-    Adults = Adult_total
-    level_array = copy.deepcopy(master_level_array)
-    
+    #create a flag for when we've found an acceptable output
+    isgood = 0
 
-    #levels 20-11 can be generated quickly, and have the highest variance
-    #offer a breakpoint to see if those levels are satisfactory, and reroll them if desired
-    outputlist = the_first_ten(Adults, PCs, 20, ws1)
+    while isgood == 0:
+    #Create dummy values to pass, so the globals don't get modified
+        PCs = PC_total
+        Adults = Adult_total
+        level_array = copy.deepcopy(master_level_array)
+        
 
-    #print(outputlist[0])
+        #levels 20-11 can be generated quickly, and have the highest variance
+        #offer a breakpoint to see if those levels are satisfactory, and reroll them if desired
+        outputlist = the_first_ten(Adults, PCs, 20, ws1)
 
-    response = input('Is this acceptable? (Y/N):')
+        #print(outputlist[0])
 
-#filter out unrecognized commands
-    while response != 'Y' and response != 'N':
-        response = input('Response not recognized, please enter Y or N:')
+        response = input('Is this acceptable? (Y/N):')
 
-    if response == 'Y':
-        print('Continuing...\n')
-        isgood = 1
+    #filter out unrecognized commands
+        while response != 'Y' and response != 'N':
+            response = input('Response not recognized, please enter Y or N:')
+
+        if response == 'Y':
+            print('Continuing...\n')
+            isgood = 1
+        else:
+            print('Rerolling...\n')
+
+    #receive the outputs from after the first 5 levels are calculated
+    Adult_total = outputlist[0]
+    PC_total = outputlist[1]
+    Current_level = outputlist[2]
+    PC_level_tracker =outputlist[3]
+    total_level_tracker = outputlist[4]
+    total_demographics = outputlist[5]
+
+    #total_demographics = the_rest(Adult_total, PC_total, Current_level, PC_level_tracker,
+    #                               total_level_tracker, total_demographics)
+
+    #to do, make it output automatically to either an excel sheet or a txt file
+    #for x in total_demographics.keys():
+    #    print(total_demographics[x])
+    #ws2 = wb.create_sheet('Big sheet 2')
+
+    wb.save(filename + '.xlsx')
+    wb.close()
+
+    txt_exist = False
+    levels = False
+    try:
+        text = open(filename + ".txt", "r")
+
+        txt_exist = True
+        fields = text.readline()
+
+        fields = fields.split(',')
+
+        if "Level Dict" in fields:
+            levels = True
+
+        text.close()
+    except:
+        print("File not found, making new file...")
+
+    if txt_exist:
+        text = open(filename + ".txt", "r")
+        full_file = text.readlines()
+        text.close()
     else:
-        print('Rerolling...\n')
+        full_file = []
 
-#receive the outputs from after the first 5 levels are calculated
-Adult_total = outputlist[0]
-PC_total = outputlist[1]
-Current_level = outputlist[2]
-PC_level_tracker =outputlist[3]
-total_level_tracker = outputlist[4]
-total_demographics = outputlist[5]
-
-total_demographics = the_rest(Adult_total, PC_total, Current_level, PC_level_tracker,
-                               total_level_tracker, total_demographics)
-
-#to do, make it output automatically to either an excel sheet or a txt file
-#for x in total_demographics.keys():
-#    print(total_demographics[x])
-ws2 = wb.create_sheet('Big sheet 2')
-
-wb.save('The new organizer.xlsx')
-wb.close()
-
-txt_exist = False
-levels = False
-try:
-    text = open("The new organizer.txt", "r")
-
-    txt_exist = True
-    fields = text.readline()
-
-    fields = fields.split(',')
-
-    if "Level Dict" in fields:
-        levels = True
-finally:
+    text = open(filename + ".txt", "w")
+    text.write("Level Dict,\n")
+    for key in range(20,10,-1):
+        text.write(str(total_demographics[key]) + "\n")
     text.close()
-
-
-if txt_exist:
-    text = open("The new organizer.txt", "r")
-    full_file = text.readlines()
-    text.close()
-else:
-    full_file = []
-
-text = open("The new organizer.txt", "w")
-text.close()
