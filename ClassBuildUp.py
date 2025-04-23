@@ -181,7 +181,8 @@ total_demographics = the_rest(PC_total, total_list, total_demographics)
 #Save the results to the excel doc
 for r in range(1,21):
     for c in range(0,mark-1):
-        ws.cell(row = 21-r, column = c+2, value = total_demographics[r][c])
+        if total_demographics[r][c] != 0:
+            ws.cell(row = 21-r, column = c+2, value = total_demographics[r][c])
 
 wb.save('The new organizer.xlsx')
 wb.close()

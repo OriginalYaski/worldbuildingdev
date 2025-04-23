@@ -43,19 +43,19 @@ def grab_PC(current, roll, level, total):
 #iterate through the various classes of that level
     for cell_pointer in range(0,mark-1):
 #add the number of PCs of that class to the current score
-        roll += level_array[current][cell_pointer]
+        if level_array[current][cell_pointer] is not None:
+            roll += level_array[current][cell_pointer]
 #if threshold is passed, choose one of the PCs of that class
         if roll > 0:
 #increment the totals to indicate a PC of this class has been selected
             level_array[current][cell_pointer] -= 1
             total[20 - current] -= 1
-#grab the PC class name to create the dictionary entry
-            key = PC_class_list[cell_pointer] + ": lvl " + str(current)
 #update the dictionary
-            if key in level:
-                level[key] += 1
+            if current in level:
+                level[current][cell_pointer] += 1
             else:
-                level[key] = 1
+                level[current] = [0]*(mark-1)
+                level[current][cell_pointer] = 1
 
             break
 #return the dictionary    
@@ -66,7 +66,7 @@ def grab_PC(current, roll, level, total):
 #method to generate 1 level of the dictionary
 def generate_level(current, Adults, PCs, total, tracker):
 #generate the sub-dictionary
-    level_dict = {"NPCs":0}
+    level_dict = {current:[0]*mark}
 
 #run until the level is full
     while total > 0:
@@ -82,7 +82,7 @@ def generate_level(current, Adults, PCs, total, tracker):
             r = random.randrange(1, Adults + 1)
 #if the number is greater than the total remaining PCs, it must be an NPC
             if r > PCs:
-                level_dict["NPCs"] += 1
+                level_dict[current][mark-1] += 1
             else:
 #if the number is less than or equal to the remaining number of PCs, find that PC and add them
                 level_dict = find_PC(PCs, current, r, level_dict, tracker)
@@ -99,9 +99,34 @@ def generate_level(current, Adults, PCs, total, tracker):
             CURRENT_PERCENT += 1
             print(str(CURRENT_PERCENT) + "% done...")
             """
-        
-    print("Level " + str(current) + ":")
-    print(level_dict)
+
+#Reformat output into a manner that is much shorter and more legible than printing the entire dict
+    print("\nLevel " + str(current) + ":")
+#We'll always have NPCs, and if we don't that's notable too
+    print("NPCs: " + str(level_dict[current][mark-1]))
+    
+    for cl in range(0,mark-1):
+#Setup to print a Class type
+        printable = PC_class_list[cl]
+        isthere = False
+
+#Search for if there are any PCs of that level
+        for lev in range(20,0,-1):
+            if lev in level_dict:
+
+#Check if any of the PCs of that level are of the right class
+                if level_dict[lev][cl] != 0:
+#Mark the class as present
+                    isthere = True
+
+#Add that level to the output string
+                    printable += ": " + str(lev) + "(" + str(level_dict[lev][cl]) + ") "
+
+#If there are any PCs of that class, let us know
+        if isthere:
+            print(printable)
+    
+    #print(level_dict)
     return Adults, PCs, level_dict
 
 #------------------------------------------------------------------------
@@ -131,13 +156,22 @@ def the_first_ten(Adults, PCs, current, ws):
 #function to generate levels 15-1 and add them to the dictionary
 def the_rest(Adults, PCs, current, PC_tracker, total_tracker, demographic):
     
-    while current > 0:
+    while current > 1:
         #loop through each level
         Adults, PCs, demographic[current] = generate_level(current, Adults, PCs,
                                                total_tracker[current-1], PC_tracker)
 
 #increment the pointer
         current -= 1
+
+#Skip level 1, it's easy to figure out, but take's too long through generate_level
+    demographic[current] = level_array[current] + [Adults - PCs]
+
+#Print it
+    print("\nLvl 1:")
+    
+    for cl in range(0,mark):
+        print(PC_class_list[cl] + ": " + str(demographic[1][cl]))
 #return finished dictionary
     return demographic
     
@@ -150,14 +184,16 @@ ws1 = wb['Big sheet 1']
 
 #Get the endpoint of the list
 global mark
-mark = ws1['A1'].value + 1
+mark = int(ws1['A1'].value + 1)
 
 #get the list of class priority
 PC_class_list = [ws1.cell(row = 21, column = i).value for i in range(2,mark+1)]
+PC_class_list += ["NPCs"]
+print(PC_class_list)
 
 #Get the totals
-PC_total = ws1.cell(row = 1, column = mark + 4).value
-Adult_total = ws1.cell(row = 2, column = mark + 4).value
+PC_total = int(ws1.cell(row = 1, column = mark + 4).value)
+Adult_total = int(ws1.cell(row = 2, column = mark + 4).value)
 
 #acquire the class distribution array
 master_level_array = {}
@@ -184,7 +220,7 @@ while isgood == 0:
     #offer a breakpoint to see if those levels are satisfactory, and reroll them if desired
     outputlist = the_first_ten(Adults, PCs, 20, ws1)
 
-    print(outputlist[0])
+    #print(outputlist[0])
 
     response = input('Is this acceptable? (Y/N):')
 
@@ -212,7 +248,33 @@ total_demographics = the_rest(Adult_total, PC_total, Current_level, PC_level_tra
 #to do, make it output automatically to either an excel sheet or a txt file
 #for x in total_demographics.keys():
 #    print(total_demographics[x])
-#ws2 = wb.create_sheet['Big sheet 2']
+ws2 = wb.create_sheet('Big sheet 2')
 
 wb.save('The new organizer.xlsx')
 wb.close()
+
+txt_exist = False
+levels = False
+try:
+    text = open("The new organizer.txt", "r")
+
+    txt_exist = True
+    fields = text.readline()
+
+    fields = fields.split(',')
+
+    if "Level Dict" in fields:
+        levels = True
+finally:
+    text.close()
+
+
+if txt_exist:
+    text = open("The new organizer.txt", "r")
+    full_file = text.readlines()
+    text.close()
+else:
+    full_file = []
+
+text = open("The new organizer.txt", "w")
+text.close()
