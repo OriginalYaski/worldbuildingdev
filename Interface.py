@@ -52,7 +52,7 @@ elif operation == "Y":
 else:
     operation3 = input(str("Seems like you're far along. Would you like to generate NPC levels? :"))
 
-
+#rework this section. Want to call from a middleman program that handles finding if a file exists, loading and storing excess information, etc.
 
 if operation3 == "Y":
     ContinentClassSetup.main(filename)
