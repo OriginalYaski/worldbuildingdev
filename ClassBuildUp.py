@@ -11,7 +11,8 @@ CURRENT_PERCENT = 0
 
 #method to setup the PC and total per-level values
 def total_lists(sheet, total, col, falloff, scale):
-    #Account for potential upper remainders
+    #The function used to generate the per-level values technically extends up to level infinity
+    #This helps take all those people that should exist at levels 21+ and rounds them into the level 20 values
     tracker = total
 
     #Create output list
@@ -128,14 +129,24 @@ def the_rest(total, PC_total_list, demographics):
     
 #------------------------------------------------------------------------
 
-#todo make it accept variable user input
-wb = load_workbook('The new organizer.xlsx')
+#Accept the user's input, and load the workbook
+filename = str(input("What Excel workbook are you working from?\n"))
+try:
+    wb = load_workbook(filename + '.xlsx')
+except:
+    filename = str(input("I couldn't find that file. Please check the file name and try again.\n"))
+
+    try:
+        wb = load_workbook(filename + '.xlsx')
+    except:
+        print("I still couldn't find that. Please doublecheck your file's located in the correct folder before trying again.")
+        exit()
 
 ws = wb['Big sheet 1']
 
 #Get the endpoint of the list
 global mark
-mark = ws['A1'].value + 1
+mark = ws['A2'].value + 1
 
 #get the list of class priority
 PC_class_list = [ws.cell(row = 21, column = i).value for i in range(2,mark+1)]
@@ -145,6 +156,7 @@ PC_total = ws.cell(row = 1, column = mark + 4).value
 Adult_total = ws.cell(row = 2, column = mark + 4).value
 
 #Setup the PC and total level distributions
+#The total_lists method has been set up to accept variable scaling, but this method isn't set up for that just yet
 PC_lvl_list = total_lists(ws, PC_total, mark+1, 169, 5)
 Total_lvl_list = total_lists(ws, Adult_total, mark+2, 169, 5)
 
@@ -183,5 +195,5 @@ for r in range(1,21):
     for c in range(0,mark-1):
         ws.cell(row = 21-r, column = c+2, value = total_demographics[r][c])
 
-wb.save('The new organizer.xlsx')
+wb.save(filename + '.xlsx')
 wb.close()
