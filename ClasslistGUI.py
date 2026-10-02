@@ -2,16 +2,15 @@
 
 import tkinter as tk
 
-class Window1:
+class PageOne(tk.Frame):
     
     #Placeholder submit command. Prints submitted list to the IDLE shell currently
-    def submit(self):
-        global root
+    def submit(self, controller):
         for i in range(len(varList)):
             if varList[i].get() == 1:
                 print(classList[i], end="\n")
 
-        root.destroy()
+        controller.finish()
 
 
     #When the button is pressed, update the displayed and stored lists
@@ -36,15 +35,16 @@ class Window1:
         for num in varList:
             num.set(0)
 
-    def run(self, campaign):
-        global c, r, updateVar, classList, varList, root
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        global classList, varList, updateVar, c, r
         c = r = pointer = 0
         #Create the window
-        root = tk.Tk()
-        root.title("Select Classes")
+        #root = tk.Tk()
+        #root.title("Select Classes")
         #Create the frames for the window
-        listFrame = tk.Frame(root)
-        bottomFrame = tk.Frame(root)
+        listFrame = tk.Frame(self)
+        bottomFrame = tk.Frame(self)
         #Place the frames within the window
         listFrame.pack(side="top")
         bottomFrame.pack(side="bottom")
@@ -86,8 +86,6 @@ class Window1:
         newClass = tk.Entry(entryFrame, textvariable = updateVar)
         newClass.pack(side="left")
         classButton = tk.Button(entryFrame, text="Add", command=lambda: self.update_list(listFrame)).pack(side="left")
-        submitButton = tk.Button(submitFrame, text="Submit", command=self.submit).pack(side="right")
+        submitButton = tk.Button(submitFrame, text="Submit", command=lambda: self.submit(controller)).pack(side="right")
         allButton = tk.Button(selectFrame, text="Select All", command=self.select_all).pack(side="top")
         noneButton = tk.Button(selectFrame, text="Select None", command=self.select_none).pack(side="bottom", padx=20)
-
-        root.mainloop()
