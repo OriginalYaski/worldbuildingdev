@@ -1,14 +1,33 @@
 #This file is intended as the general GUI/primary operator of each of the sub-files in this project
 
 import tkinter as tk
+from openpyxl.styles import Border, Side
+from openpyxl import Workbook
 
 class PageOne(tk.Frame):
     
     #Placeholder submit command. Prints submitted list to the IDLE shell currently
     def submit(self, controller):
+        thin = Side(border_style="thin", color="00000000")
+        topcell = Border(top=thin, left=thin, right=thin)
+        bottomcell = Border(left=thin, right=thin, bottom=thin)
+
+        x = 0
         for i in range(len(varList)):
             if varList[i].get() == 1:
-                print(classList[i], end="\n")
+                x += 1
+                controller.ws.cell(row = 21, column = x+1, value = classList[i])
+                
+
+        #Store the size of the class matrix and label it
+        lengthtitle = controller.ws['A1']
+        c_length = controller.ws['A2']
+
+        lengthtitle.value = "Number of classes"
+        c_length.value = x
+
+        lengthtitle.border = topcell
+        c_length.border = bottomcell
 
         controller.finish()
 
