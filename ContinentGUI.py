@@ -1,68 +1,44 @@
-#This file is intended as the general GUI/primary operator of each of the sub-files in this project
+#Top level GUI caller for the project
 
 import tkinter as tk
+from openpyxl import Workbook
+from openpyxl import load_workbook
+from ClasslistGUI import Window1
 
 def submit():
-    for i in range(len(varList)):
-        if varList[i].get() == 1:
-            print(classList[i], end="\n")
-
+    campaign = updateVar.get()
+    wb = Workbook()
+    ws = wb.create_sheet('Big sheet 1')
+    wb.save(campaign + '.xlsx')
+    wb.close()
     root.destroy()
 
-r = c = pointer = 0
+    window = Window1()
+    window.run(campaign)
 
+with open("default values.txt") as f:
+    defaultlist = f.read().splitlines()
+    classList = defaultlist[0].split(", ")
+    '''pop = int(defaultlist[1])
+    ratio = int(defaultlist[2])'''
+
+#Create the window
 root = tk.Tk()
-root.title("Select Classes")
-
-listFrame = tk.Frame(root)
-bottomFrame = tk.Frame(root)
-
-listFrame.pack(side="top")
-bottomFrame.pack(side="bottom")
-
-entryFrame = tk.Frame(bottomFrame)
-submitFrame = tk.Frame(bottomFrame)
-
-entryFrame.pack(side="left")
-submitFrame.pack(side="right")
-
-classList = ["Alchemist", "Animist", "Barbarian", "Bard", "Champion",
-             "Cleric", "Commander", "Druid", "Exemplar", "Fighter",
-             "Guardian", "Gunslinger", "Inventor", "Investigator", "Kineticist",
-             "Magus", "Monk", "Oracle", "Psychic", "Ranger",
-             "Rogue", "Sorcerer", "Summoner", "Swashbuckler", "Thaumaturge",
-             "Witch", "Wizard"]
-
-varList = [tk.IntVar() for _ in range(27)]
-
-
-for name in classList:
-    tk.Checkbutton(listFrame, text=name, variable=varList[pointer]).grid(row=r, column=c)
-    c += 1
-    pointer += 1
-    if c > 4:
-        r += 1
-        c = 0
+root.title("New campaign")
+#Create the frames for the window
+titleFrame = tk.Frame(root)
+enterFrame = tk.Frame(root)
+#Place the frames within the window
+titleFrame.pack(side="top")
+enterFrame.pack(side="bottom")
 
 updateVar = tk.StringVar()
 
-def update_list():
-    global c, r
-    classList.append(updateVar.get())
-    varList.append(tk.IntVar())
-
-    tk.Checkbutton(listFrame, text=classList[-1], variable=varList[-1]).grid(row=r, column=c)
-    c += 1
-    if c > 4:
-        r += 1
-        c = 0
-
-    updateVar.set("")
-
-newLabel = tk.Label(entryFrame, text="Add another class to the list").pack(side="top")
-newClass = tk.Entry(entryFrame, textvariable = updateVar)
-newClass.pack(side="left")
-classButton = tk.Button(entryFrame, text="Add", command=update_list).pack(side="left")
-submitButton = tk.Button(submitFrame, text="Submit", command=submit).pack(side="bottom")
+title = tk.Label(titleFrame, text="Welcome to your new campaign! Please, give it a name.").pack(side="top")
+newCampaign = tk.Entry(enterFrame, textvariable = updateVar)
+newCampaign.pack(side="left")
+submitButton = tk.Button(enterFrame, text="Submit", command=submit).pack(side="right")
 
 root.mainloop()
+
+
