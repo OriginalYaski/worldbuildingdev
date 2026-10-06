@@ -4,6 +4,7 @@ import tkinter as tk
 from openpyxl import Workbook
 from openpyxl import load_workbook
 from DemographicsGUI import PageOne
+from ScalingGUI import PageTwo
 from ClasslistGUI import PageThree
 
 LARGE_FONT= ("Verdana", 12)
@@ -11,6 +12,11 @@ LARGE_FONT= ("Verdana", 12)
 class MainWindow(tk.Tk):
 
     def __init__(self, *args, **kwargs):
+
+        #Load the default population values
+        with open("default values.txt") as f:
+            defaultlist = f.read().splitlines()
+            
         global campaign, wb, ws
         campaign = ""
         
@@ -25,9 +31,9 @@ class MainWindow(tk.Tk):
 
         self.frames = {}
 
-        for F in (StartPage, PageOne, PageThree):
+        for F in (StartPage, PageOne, PageTwo, PageThree):
 
-            frame = F(container, self)
+            frame = F(container, self, defaultlist)
 
             self.frames[F] = frame
 
@@ -53,7 +59,7 @@ class MainWindow(tk.Tk):
 
 class StartPage(tk.Frame):
 
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, defaults):
         tk.Frame.__init__(self,parent)
         #root.title("New campaign")
         #Create the frames for the window

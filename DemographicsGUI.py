@@ -3,7 +3,7 @@
 import tkinter as tk
 from openpyxl.styles import Border, Side
 from openpyxl import Workbook, cell
-from ClasslistGUI import PageThree
+from ScalingGUI import PageTwo
 
 LARGE_FONT= ("Verdana", 12)
 thin = Side(border_style="thin", color="00000000")
@@ -27,9 +27,12 @@ class PageOne(tk.Frame):
         controller.ws['B1'].value = calcvars[4]
         controller.ws['B2'].value = calcvars[3] - calcvars[4]
         
+        controller.ws.column_dimensions['A'].width = 21
+        controller.ws.column_dimensions['B'].width = 13
         
         controller.save()
-        controller.show_frame(PageThree)
+        controller.frames[PageTwo].startup(controller)
+        controller.show_frame(PageTwo)
 
     #This function updates the population counts for the total working population and the total working PC population
     def total(self):
@@ -60,7 +63,7 @@ class PageOne(tk.Frame):
         #Clear the submitted field
         newvars[target].set("")
         
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, defaults):
         #Initiate the master frame
         tk.Frame.__init__(self, parent)
 
@@ -89,10 +92,6 @@ class PageOne(tk.Frame):
         leftFrame.pack(side="left")
         rightFrame.pack(side="right")
 
-        #Load the default population values
-        with open("default values.txt") as f:
-            defaultlist = f.read().splitlines()
-
         #Initiate the lists that will be used to populate the window Labels
         global textvars, newvars, calcvars
         textvars = [tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar()]
@@ -100,8 +99,8 @@ class PageOne(tk.Frame):
 
         #Set the Labels based on the default values
         for i in range(3):
-            textvars[i].set(defaultlist[i+1])
-            calcvars[i] = float(defaultlist[i+1])
+            textvars[i].set(defaults[i+1])
+            calcvars[i] = float(defaults[i+1])
 
         #Convert the ratios into percentages
         textvars[1].set(textvars[1].get() + "%")

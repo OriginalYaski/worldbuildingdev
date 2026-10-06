@@ -1,4 +1,4 @@
-#This file is intended as the general GUI/primary operator of each of the sub-files in this project
+#This window is for the purpose of setting up the available classes in this setting
 
 import tkinter as tk
 from openpyxl.styles import Border, Side
@@ -17,7 +17,7 @@ class PageThree(tk.Frame):
         for i in range(len(varList)):
             if varList[i].get() == 1:
                 x += 1
-                controller.ws.cell(row = 21, column = x+3, value = classList[i])
+                controller.ws.cell(row = 21, column = x+5, value = classList[i])
                 
 
         #Store the size of the class matrix and label it
@@ -57,7 +57,7 @@ class PageThree(tk.Frame):
         for num in varList:
             num.set(0)
 
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, defaults):
         tk.Frame.__init__(self, parent)
         global classList, varList, updateVar, c, r
         c = r = pointer = 0
@@ -77,9 +77,7 @@ class PageThree(tk.Frame):
         submitFrame.pack(side="right")
         selectFrame.pack(side="left")
         #Set up the class list
-        with open("default values.txt") as f:
-            defaultlist = f.read().splitlines()
-            classList = defaultlist[0].split(", ")
+        classList = defaults[0].split(", ")
         #Create list to hold values of checkbuttons
         varList = [tk.IntVar() for _ in range(len(classList))]
 
