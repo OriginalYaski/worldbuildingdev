@@ -3,7 +3,8 @@
 import tkinter as tk
 from openpyxl import Workbook
 from openpyxl import load_workbook
-from ClasslistGUI import PageOne
+from DemographicsGUI import PageOne
+from ClasslistGUI import PageThree
 
 LARGE_FONT= ("Verdana", 12)
 
@@ -14,6 +15,7 @@ class MainWindow(tk.Tk):
         campaign = ""
         
         tk.Tk.__init__(self, *args, **kwargs)
+        self.title("TTRPG population generator")
         container = tk.Frame(self)
 
         container.pack(side="top", fill="both", expand = True)
@@ -23,7 +25,7 @@ class MainWindow(tk.Tk):
 
         self.frames = {}
 
-        for F in (StartPage, PageOne):
+        for F in (StartPage, PageOne, PageThree):
 
             frame = F(container, self)
 
@@ -34,12 +36,17 @@ class MainWindow(tk.Tk):
         self.show_frame(StartPage)
 
     def show_frame(self, cont):
+        '''if cont == PageThree:
+            cont.setup(self.frames[cont], self)'''
 
         frame = self.frames[cont]
         frame.tkraise()
 
-    def finish(self):
+    def save(self):
         self.wb.save(self.campaign + '.xlsx')
+
+    def finish(self):
+        self.save()
         self.wb.close()
 
         root.destroy()

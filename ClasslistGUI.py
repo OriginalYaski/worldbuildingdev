@@ -3,8 +3,9 @@
 import tkinter as tk
 from openpyxl.styles import Border, Side
 from openpyxl import Workbook
+from ClassgenGUI import PageFour
 
-class PageOne(tk.Frame):
+class PageThree(tk.Frame):
     
     #Placeholder submit command. Prints submitted list to the IDLE shell currently
     def submit(self, controller):
@@ -16,18 +17,20 @@ class PageOne(tk.Frame):
         for i in range(len(varList)):
             if varList[i].get() == 1:
                 x += 1
-                controller.ws.cell(row = 21, column = x+1, value = classList[i])
+                controller.ws.cell(row = 21, column = x+3, value = classList[i])
                 
 
         #Store the size of the class matrix and label it
-        lengthtitle = controller.ws['A1']
-        c_length = controller.ws['A2']
+        lengthtitle = controller.ws['A5']
+        c_length = controller.ws['A6']
 
         lengthtitle.value = "Number of classes"
         c_length.value = x
 
         lengthtitle.border = topcell
         c_length.border = bottomcell
+
+        #controller.save()
 
         controller.finish()
 
@@ -58,9 +61,7 @@ class PageOne(tk.Frame):
         tk.Frame.__init__(self, parent)
         global classList, varList, updateVar, c, r
         c = r = pointer = 0
-        #Create the window
-        #root = tk.Tk()
-        #root.title("Select Classes")
+        
         #Create the frames for the window
         listFrame = tk.Frame(self)
         bottomFrame = tk.Frame(self)
@@ -79,12 +80,6 @@ class PageOne(tk.Frame):
         with open("default values.txt") as f:
             defaultlist = f.read().splitlines()
             classList = defaultlist[0].split(", ")
-        '''classList = ["Alchemist", "Animist", "Barbarian", "Bard", "Champion",
-                     "Cleric", "Commander", "Druid", "Exemplar", "Fighter",
-                     "Guardian", "Gunslinger", "Inventor", "Investigator", "Kineticist",
-                     "Magus", "Monk", "Oracle", "Psychic", "Ranger",
-                     "Rogue", "Sorcerer", "Summoner", "Swashbuckler", "Thaumaturge",
-                     "Witch", "Wizard"]'''
         #Create list to hold values of checkbuttons
         varList = [tk.IntVar() for _ in range(len(classList))]
 
