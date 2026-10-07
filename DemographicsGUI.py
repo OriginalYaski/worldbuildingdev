@@ -3,14 +3,8 @@
 import tkinter as tk
 from openpyxl.styles import Border, Side
 from openpyxl import Workbook, cell
+from Universal_GUI_styling import *
 from ScalingGUI import PageTwo
-
-LARGE_FONT= ("Verdana", 12)
-thin = Side(border_style="thin", color="00000000")
-topcell = Border(top=thin, left=thin, right=thin)
-bottomcell = Border(left=thin, right=thin, bottom=thin)
-leftcell = Border(top=thin, left=thin, bottom=thin)
-rightcell = Border(top=thin, right=thin, bottom=thin)
 
 class PageOne(tk.Frame):
 
@@ -20,8 +14,8 @@ class PageOne(tk.Frame):
 
         for i in range(3):
             controller.ws['A' + str(i+1)].value = strings[i]
-            controller.ws['A' + str(i+1)].border = leftcell
-            controller.ws['B' + str(i+1)].border = rightcell
+            controller.ws['A' + str(i+1)].border = LEFT_CELL
+            controller.ws['B' + str(i+1)].border = RIGHT_CELL
         
         controller.ws['B3'].value = calcvars[3]
         controller.ws['B1'].value = calcvars[4]

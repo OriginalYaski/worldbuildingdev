@@ -3,15 +3,13 @@
 import tkinter as tk
 from openpyxl.styles import Border, Side
 from openpyxl import Workbook
+from Universal_GUI_styling import *
 from ClassgenGUI import PageFour
 
 class PageThree(tk.Frame):
     
     #Placeholder submit command. Prints submitted list to the IDLE shell currently
     def submit(self, controller):
-        thin = Side(border_style="thin", color="00000000")
-        topcell = Border(top=thin, left=thin, right=thin)
-        bottomcell = Border(left=thin, right=thin, bottom=thin)
 
         x = 0
         for i in range(len(varList)):
@@ -27,8 +25,8 @@ class PageThree(tk.Frame):
         lengthtitle.value = "Number of classes"
         c_length.value = x
 
-        lengthtitle.border = topcell
-        c_length.border = bottomcell
+        lengthtitle.border = TOP_CELL
+        c_length.border = BOTTOM_CELL
 
         #controller.save()
 

@@ -3,6 +3,7 @@
 import tkinter as tk
 import random
 from openpyxl import Workbook
+from Universal_GUI_styling import *
 from ClasslistGUI import PageThree
 
 
@@ -15,8 +16,26 @@ class PageTwo(tk.Frame):
 
         #Setup the PC and total level distributions
         #The total_lists method has been set up to accept variable scaling, but this method isn't set up for that just yet
-        PC_lvl_list = self.total_lists(controller.ws, int(PC_total.get()), 4, 169, 5)
-        Total_lvl_list = self.total_lists(controller.ws, int(Adult_total.get()), 3, 169, 5)
+        PC_lvl_list = self.total_lists(controller.ws, PC_total,
+                                       4, int(scalar.get()), int(frequency.get()))
+        Total_lvl_list = self.total_lists(controller.ws, Adult_total,
+                                          3, int(scalar.get()), int(frequency.get()))
+
+        controller.ws['C21'].value = "Adults per level"
+        controller.ws['C21'].border = BOTTOM_CELL
+        controller.ws.column_dimensions['C'].width = 15
+        
+        controller.ws['D21'].value = "PCs per level"
+        controller.ws['D21'].border = BOTTOM_CELL
+        controller.ws.column_dimensions['D'].width = 13
+
+        # Apply style
+        for i, rowOfCellObjects in enumerate(controller.ws['C2':'D20']):
+            for n, cellObj in enumerate(rowOfCellObjects):
+                cellObj.border = COLUMN
+        controller.ws['C1'].border = TOP_CELL
+        controller.ws['D1'].border = TOP_CELL
+        
         
         controller.save()
         controller.show_frame(PageThree)
@@ -58,19 +77,26 @@ class PageTwo(tk.Frame):
 
     def startup(self, controller):
 
+        global PC_total, Adult_total
+
         #Get the totals
-        PC_total.set(controller.ws.cell(row = 1, column = 2).value)
-        Adult_total.set(controller.ws.cell(row = 3, column = 2).value)
+        PC_total = int(controller.ws.cell(row = 1, column = 2).value)
+        Adult_total = int(controller.ws.cell(row = 3, column = 2).value)
         
 #------------------------------------------------------------------------
 
     def __init__(self, parent, controller, defaults):
         tk.Frame.__init__(self, parent)
 
-        global PC_total, Adult_total
+        global scalar, frequency
+
+        PC_total = 1
+        Adult_total = 1
         
-        PC_total = tk.StringVar()
-        Adult_total = tk.StringVar()
+        scalar = tk.StringVar()
+        scalar.set(defaults[4])
+        frequency = tk.StringVar()
+        frequency.set(defaults[5])
 
         submitButton = tk.Button(self, text="Submit",
                                  command=lambda: self.submit(controller)).pack(side="bottom")
