@@ -4,29 +4,24 @@ import tkinter as tk
 from openpyxl.styles import Border, Side
 from openpyxl import Workbook, cell
 from Universal_GUI_styling import *
-from ScalingGUI import PageTwo
 
 class PageOne(tk.Frame):
+        
+#------------------------------------------------------------------------
 
     #This function saves the generated values to the appropriate spot in the excel file and moves to the next page
     def submit(self, controller):
-        strings = ["Active PC population", "Active NPC population", "Total active population"]
 
-        for i in range(3):
-            controller.ws['A' + str(i+1)].value = strings[i]
-            controller.ws['A' + str(i+1)].border = LEFT_CELL
-            controller.ws['B' + str(i+1)].border = RIGHT_CELL
-        
+        #Write values to the sheet            
         controller.ws['B3'].value = calcvars[3]
         controller.ws['B1'].value = calcvars[4]
         controller.ws['B2'].value = calcvars[3] - calcvars[4]
         
-        controller.ws.column_dimensions['A'].width = 21
-        controller.ws.column_dimensions['B'].width = 13
-        
         controller.save()
-        controller.frames[PageTwo].startup(controller)
-        controller.show_frame(PageTwo)
+        controller.frames[2].startup(controller)
+        controller.show_frame(2)
+        
+#------------------------------------------------------------------------
 
     #This function updates the population counts for the total working population and the total working PC population
     def total(self):
@@ -37,6 +32,8 @@ class PageOne(tk.Frame):
         #Store both these values for display
         textvars[3].set(calcvars[3])
         textvars[4].set(calcvars[4])
+        
+#------------------------------------------------------------------------
 
     #This function stores the correct input variable, then updates the displays
     def update(self, target):
@@ -54,8 +51,29 @@ class PageOne(tk.Frame):
         #Update the calculations
         self.total()
 
+        #Marks that the values have been updated
+        controller.ws['A37'].value = 2
+
         #Clear the submitted field
         newvars[target].set("")
+        
+#------------------------------------------------------------------------
+
+    #This function performs initial sheet formatting the first time this page is passed to
+    def startup(self, controller):
+
+        strings = ["Active PC population", "Active NPC population", "Total active population"]
+
+        for i in range(0, 3):
+            controller.ws['A' + str(i+1)].value = strings[i]
+            controller.ws['A' + str(i+1)].border = LEFT_CELL
+            controller.ws['B' + str(i+1)].border = RIGHT_CELL
+            
+        controller.ws.column_dimensions['A'].width = 21
+        controller.ws.column_dimensions['B'].width = 13
+        controller.ws['A37'].value = 2
+        
+#------------------------------------------------------------------------
         
     def __init__(self, parent, controller, defaults):
         #Initiate the master frame

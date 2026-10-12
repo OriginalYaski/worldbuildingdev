@@ -1,15 +1,21 @@
 #Top level GUI caller for the project
 
 import tkinter as tk
+from tkinter import font
 from openpyxl import Workbook
 from openpyxl import load_workbook
 from DemographicsGUI import PageOne
 from ScalingGUI import PageTwo
 from ClasslistGUI import PageThree
+from ClassgenGUI import PageFour
 
 LARGE_FONT= ("Verdana", 12)
+        
+#------------------------------------------------------------------------
 
 class MainWindow(tk.Tk):
+        
+#------------------------------------------------------------------------
 
     def __init__(self, *args, **kwargs):
 
@@ -29,17 +35,21 @@ class MainWindow(tk.Tk):
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
 
-        self.frames = {}
+        self.frames = []
 
-        for F in (StartPage, PageOne, PageTwo, PageThree):
+        for F in (StartPage, PageOne, PageTwo, PageThree, PageFour):
 
             frame = F(container, self, defaultlist)
 
-            self.frames[F] = frame
+            self.frames.append(frame)
 
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(StartPage)
+        self.show_frame(0)
+
+        self.geometry("600x444")
+        
+#------------------------------------------------------------------------
 
     def show_frame(self, cont):
         '''if cont == PageThree:
@@ -50,14 +60,20 @@ class MainWindow(tk.Tk):
 
     def save(self):
         self.wb.save(self.campaign + '.xlsx')
+        
+#------------------------------------------------------------------------
 
     def finish(self):
         self.save()
         self.wb.close()
 
         root.destroy()
+        
+#------------------------------------------------------------------------
 
 class StartPage(tk.Frame):
+        
+#------------------------------------------------------------------------
 
     def __init__(self, parent, controller, defaults):
         tk.Frame.__init__(self,parent)
@@ -75,13 +91,26 @@ class StartPage(tk.Frame):
         newCampaign = tk.Entry(enterFrame, textvariable = updateVar)
         newCampaign.pack(side="left")
         submitButton = tk.Button(enterFrame, text="Submit", command=lambda: self.submit(updateVar.get(), controller)).pack(side="right")
+        
+#------------------------------------------------------------------------
 
     def submit(self, title, controller):
         controller.campaign = title
         controller.wb = Workbook()
-        controller.ws = controller.wb.create_sheet('Big sheet 1')
+        controller.ws = controller.wb.active
+        controller.ws.title = 'Class Array'
+        controller.ws['A36'].value = 'Modification array:'
+        for i in range(1,5):
+            controller.ws.cell(row = 37, column = i, value = 0)
+        controller.wb.create_sheet('Full Array')
 
-        controller.show_frame(PageOne)
+        controller.save()
+        controller.frames[1].startup(controller)
+        controller.show_frame(1)
+        #controller.frames[4].setup(controller)
+        #controller.show_frame(3)
+        
+#------------------------------------------------------------------------
 
 '''with open("default values.txt") as f:
     defaultlist = f.read().splitlines()
