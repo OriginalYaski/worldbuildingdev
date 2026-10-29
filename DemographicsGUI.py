@@ -4,6 +4,7 @@ import tkinter as tk
 from openpyxl.styles import Border, Side
 from openpyxl import Workbook, cell
 from Universal_GUI_styling import *
+import Tooltip
 
 class PageOne(tk.Frame):
         
@@ -12,10 +13,11 @@ class PageOne(tk.Frame):
     #This function saves the generated values to the appropriate spot in the excel file and moves to the next page
     def submit(self, controller):
 
-        #Write values to the sheet            
-        controller.ws['B3'].value = calcvars[3]
+        #Write values to the sheet
         controller.ws['B1'].value = calcvars[4]
-        controller.ws['B2'].value = calcvars[3] - calcvars[4]
+        controller.ws['B2'].value = calcvars[3] - calcvars[4]            
+        controller.ws['B3'].value = calcvars[3]
+        controller.ws['B4'].value = calcvars[0]
         
         controller.save()
         controller.frames[2].startup(controller)
@@ -36,7 +38,7 @@ class PageOne(tk.Frame):
 #------------------------------------------------------------------------
 
     #This function stores the correct input variable, then updates the displays
-    def update(self, target):
+    def update(self, target, controller):
 
         #If the entry is for the total population, display it as is
         if target == 0:
@@ -44,6 +46,7 @@ class PageOne(tk.Frame):
         #Otherwise, display it as a percentage
         else:
             textvars[target].set(newvars[target].get() + "%")
+            controller.load_list[target-1] = newvars[target].get()
 
         #Convert and store the variable as a float as well for further calculations
         calcvars[target] = float(newvars[target].get())
@@ -59,18 +62,43 @@ class PageOne(tk.Frame):
         
 #------------------------------------------------------------------------
 
+    #Loads the relevant information to populate the fields in the event that we are loading an already existing campaign
+    def load_in(self, controller):
+        #Load the variables stored on the main sheet
+        textvars[0].set(str(controller.ws['B4'].value))
+        calcvars[0] = int(controller.ws['B4'].value)
+
+        textvars[3].set(str(controller.ws['B3'].value))
+        calcvars[3] = int(controller.ws['B3'].value)
+
+        textvars[4].set(str(controller.ws['B1'].value))
+        calcvars[4] = int(controller.ws['B1'].value)
+
+        #Load in the percentage values from the secondary file
+        calcvars[1] = float(controller.load_list[0])
+        textvars[1].set(str(calcvars[1]) + "%")
+
+        calcvars[2] = float(controller.load_list[1])
+        textvars[2].set(str(calcvars[2]) + "%")
+        
+#------------------------------------------------------------------------
+
     #This function performs initial sheet formatting the first time this page is passed to
     def startup(self, controller):
 
-        strings = ["Active PC population", "Active NPC population", "Total active population"]
+        strings = ["Active PC population", "Active NPC population", "Total Active population", "Total Population"]
 
-        for i in range(0, 3):
+        for i in range(0, 4):
             controller.ws['A' + str(i+1)].value = strings[i]
             controller.ws['A' + str(i+1)].border = LEFT_CELL
             controller.ws['B' + str(i+1)].border = RIGHT_CELL
             
         controller.ws.column_dimensions['A'].width = 21
         controller.ws.column_dimensions['B'].width = 13
+
+        controller.load_list[0] = calcvars[1]
+        controller.load_list[1] = calcvars[2]
+        
         controller.ws['A37'].value = 2
         
 #------------------------------------------------------------------------
@@ -125,24 +153,24 @@ class PageOne(tk.Frame):
         newvars = [tk.StringVar(), tk.StringVar(), tk.StringVar()]
 
         #Title the window to give direction
-        title = tk.Label(topFrame, text="Now, determine this world/continent's demographics.", font=LARGE_FONT).pack(side="top", pady=10, padx=10)
+        title = tk.Label(topFrame, text="Now, determine this setting's demographics.", font=LARGE_FONT).pack(side="top", pady=10, padx=10)
 
         #Set up the first frame to display the total population
-        popGo = tk.Button(popFrame, text="Update population", command=lambda: self.update(0)).pack(side="bottom")
+        popGo = tk.Button(popFrame, text="Update population", command=lambda: self.update(0, controller)).pack(side="bottom")
         popSet = tk.Entry(popFrame, textvariable = newvars[0])
         popSet.pack(side="bottom")
         pop = tk.Label(popFrame, textvariable=textvars[0]).pack(side="bottom")
         popTitle = tk.Label(popFrame, text="What is the total population?").pack(side="bottom")
 
         #Set up the next frame to display what percentage of the population is of working age
-        workGo = tk.Button(workFrame, text="Update working class", command=lambda: self.update(1)).pack(side="bottom")
+        workGo = tk.Button(workFrame, text="Update working class", command=lambda: self.update(1, controller)).pack(side="bottom")
         workSet = tk.Entry(workFrame, textvariable = newvars[1])
         workSet.pack(side="bottom")
         working = tk.Label(workFrame, textvariable=textvars[1]).pack(side="bottom")
         workTitle = tk.Label(workFrame, text="What percentage of the population is of working age?").pack(side="bottom")
 
         #Set up the next frame to display how common PCs are in this world
-        PCGo = tk.Button(PCFrame, text="Update character class", command=lambda: self.update(2)).pack(side="bottom")
+        PCGo = tk.Button(PCFrame, text="Update character class", command=lambda: self.update(2, controller)).pack(side="bottom")
         PCSet = tk.Entry(PCFrame, textvariable = newvars[2])
         PCSet.pack(side="bottom")
         PCs = tk.Label(PCFrame, textvariable=textvars[2]).pack(side="bottom")
@@ -155,4 +183,6 @@ class PageOne(tk.Frame):
         workTotal = tk.Label(leftFrame, textvariable=textvars[3]).pack(side="bottom")
         PCName = tk.Label(rightFrame, text="Total active population with PC levels.").pack(side="top")
         PCTotal = tk.Label(rightFrame, textvariable=textvars[4]).pack(side="bottom")
-        
+
+        #Create the tooltips for the various labels
+        #Tooltip.CreateToolTip(popTitle, text='This is the complete, total population of this campaign setting, whether that is a nation, a continent, or a planet.')

@@ -21,7 +21,9 @@ class MainWindow(tk.Tk):
 
         #Load the default population values
         with open("default values.txt") as f:
-            defaultlist = f.read().splitlines()
+            self.defaultlist = f.read().splitlines()
+        #Instantiate a list to hold the values we save/load from a separate file
+        self.load_list = ["ND"] * 7
             
         global campaign, wb, ws
         campaign = ""
@@ -39,7 +41,7 @@ class MainWindow(tk.Tk):
 
         for F in (StartPage, PageOne, PageTwo, PageThree, PageFour):
 
-            frame = F(container, self, defaultlist)
+            frame = F(container, self, self.defaultlist)
 
             self.frames.append(frame)
 
@@ -57,9 +59,14 @@ class MainWindow(tk.Tk):
 
         frame = self.frames[cont]
         frame.tkraise()
+        
+#------------------------------------------------------------------------
 
     def save(self):
         self.wb.save(self.campaign + '.xlsx')
+        with open(self.campaign + '.txt', 'w') as f:
+            for line in self.load_list:
+                f.write(f"{line}\n")
         
 #------------------------------------------------------------------------
 
@@ -76,8 +83,10 @@ class StartPage(tk.Frame):
 #------------------------------------------------------------------------
 
     def __init__(self, parent, controller, defaults):
+        #default = tk.font.nametofont("TkDefaultFont")
+        #print(default.actual())
+        global titleFrame, messageVar, load_list
         tk.Frame.__init__(self,parent)
-        #root.title("New campaign")
         #Create the frames for the window
         titleFrame = tk.Frame(self)
         enterFrame = tk.Frame(self)
@@ -86,11 +95,14 @@ class StartPage(tk.Frame):
         enterFrame.pack(side="bottom")
 
         updateVar = tk.StringVar()
+        messageVar = tk.StringVar()
 
-        title = tk.Label(titleFrame, text="Welcome to your new campaign! Please, give it a name.", font=LARGE_FONT).pack(side="top", pady=10, padx=10)
-        newCampaign = tk.Entry(enterFrame, textvariable = updateVar)
-        newCampaign.pack(side="left")
-        submitButton = tk.Button(enterFrame, text="Submit", command=lambda: self.submit(updateVar.get(), controller)).pack(side="right")
+        title = tk.Label(titleFrame, text="Welcome to your new campaign! Please, give it a name.", font=LARGE_FONT).pack(side="top", pady=100)
+        error_msg = tk.Message(titleFrame, textvariable = messageVar, width=500).pack(side="bottom")
+        campaign_name = tk.Entry(enterFrame, textvariable = updateVar)
+        campaign_name.pack(side="top")
+        load_button = tk.Button(enterFrame, text="Load this Campaign", command=lambda: self.load(updateVar.get(), controller)).pack(side="left", padx=25, pady=(0,50))
+        new_button = tk.Button(enterFrame, text="Start new Campaign", command=lambda: self.submit(updateVar.get(), controller)).pack(side="right", padx=25, pady=(0,50))
         
 #------------------------------------------------------------------------
 
@@ -100,7 +112,7 @@ class StartPage(tk.Frame):
         controller.ws = controller.wb.active
         controller.ws.title = 'Class Array'
         controller.ws['A36'].value = 'Modification array:'
-        for i in range(1,5):
+        for i in range(1,6):
             controller.ws.cell(row = 37, column = i, value = 0)
         controller.wb.create_sheet('Full Array')
 
@@ -109,8 +121,48 @@ class StartPage(tk.Frame):
         controller.show_frame(1)
         #controller.frames[4].setup(controller)
         #controller.show_frame(3)
+         
+#------------------------------------------------------------------------
+
+    def load(self, title, controller):
+
+        controller.campaign = title
+        #Try to load the Campaign, and display an error if unsuccessful
+        try:
+            #Load in the user friendly sheet
+            controller.wb = load_workbook(title + '.xlsx')
+
+            #Load in the externally stored values
+            with open(title + '.txt') as f:
+                controller.load_list = f.read().splitlines()
+        except:
+            messageVar.set("I couldn't find a Campaign of this name. Try doublechecking your spelling and confirming that the Campaign is saved in the correct directory.")
+            return
+
+        #If the campaign is found, move the active sheet to the sheet containing our progress tracker
+        try:
+            controller.ws = controller.wb['Class Array']
+        except:
+        #If the main sheet isn't found, you're probably not loading an actual campaign
+            messageVar.set("This file doesn't seem to be a Campaign file. Please check your spelling to confirm that this is an actual Campaign.")
+            return
+
+        #First, load in all pages that have been visited
+        for i in range(5,0,-1):
+            if controller.ws.cell(row=37, column=i).value != 0:
+                controller.frames[i].load_in(controller)
+        
+        #Find what page was most recently updated, but whose updates have not yet been passed to another page, and move the window to that page
+        for i in range(1,6):
+            if int(controller.ws.cell(row=37, column=i).value) == 2:
+                controller.show_frame(i)
+                return
+
+        #If no page shows as updated, this sheet isn't working properly. Let the user know
+        messageVar.set("This file doesn't seem to be formatted properly. Check the integrity of this file, or load another Campaign.")
         
 #------------------------------------------------------------------------
+
 
 '''with open("default values.txt") as f:
     defaultlist = f.read().splitlines()
@@ -135,7 +187,10 @@ newCampaign = tk.Entry(enterFrame, textvariable = updateVar)
 newCampaign.pack(side="left")
 submitButton = tk.Button(enterFrame, text="Submit", command=submit).pack(side="right")
 '''
+global root
 root = MainWindow()
+root.title("New Campaign")
+root.resizable(False, False)
 root.mainloop()
 
 

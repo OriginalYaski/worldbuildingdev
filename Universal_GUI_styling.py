@@ -2,7 +2,9 @@ import tkinter as tk
 from openpyxl.styles import Border, Side
 
 
-LARGE_FONT= ("Verdana", 12)
+LARGE_FONT = ("Verdana", 12)
+DEFAULT_FONT = ("Segoe UI", 10)
+
 THIN = Side(border_style="thin", color="00000000")
 
 TOP_CELL = Border(top=THIN, left=THIN, right=THIN)

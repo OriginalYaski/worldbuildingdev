@@ -31,6 +31,12 @@ class PageThree(tk.Frame):
         for i in range(len(classes)):
             controller.ws.cell(row = 21, column = i+6, value = classes[i])
 
+        #Store the ENTIRE list (even those not selected) to the secondary file
+        second_list = classList[0]
+        for i in range(1, len(classList)):
+            second_list = second_list + ", " + classList[i]
+        controller.load_list[4] = second_list
+
         #Store the length of the new class list and mark that it has been updated
         controller.ws['A6'].value = len(classes)
         controller.ws['C37'].value = 2
@@ -52,7 +58,7 @@ class PageThree(tk.Frame):
         else:
             
         #If there is at least one class selected, and this is our first time passing through, we can proceed automatically
-            if controller.ws['C37'].value == 0:
+            if controller.ws['C37'].value == 0.5:
                 #Perform setup stylization to the sheet
                 controller.ws['A5'].value = "Number of classes"
                 controller.ws['A5'].border = TOP_CELL
@@ -80,8 +86,8 @@ class PageThree(tk.Frame):
             else:
                 
                 #First, clear out the old list
-                for n in range(controller.ws['A6'].value):
-                    controller.ws.cell(row = 21, column = n+5).value = None
+                for i in range(controller.ws['A6'].value):
+                    controller.ws.cell(row = 21, column = i+6).value = None
 
                 #Then write the new list
                 self.write_list(controller, writeList)
@@ -123,10 +129,41 @@ class PageThree(tk.Frame):
         
 #------------------------------------------------------------------------
 
+    def load_in(self, controller):
+        #If we are loading in a campaign, load in all the classes in the previous list (even those that weren't selected)
+        new_list = controller.load_list[4].split(", ")
+        self.startup(controller, new_list, True)
+
+        #Find which ones were selected, and set those boxes to checked
+        for i in range(controller.ws['A6'].value):
+            classname = controller.ws.cell(row = 21, column = i+6).value
+        #Every class name that was written to the excel file SHOULD be present in the secondary file
+        #If it's not, then the users were meddling with one of the two files, and I at this time I am not about to correct their mistake (maybe I'll come back to it once this project is further along)
+            if classname in classList:
+                varList[classList.index(classname)].set(1)
+        
+#------------------------------------------------------------------------
+
+    def startup(self, controller, defaults, load=False):
+        global listFrame
+        #Load in each class name in the list, and update the variables and display for each name
+        if load or controller.ws['C37'].value == 0:
+            for classname in defaults:
+                updateVar.set(classname)
+                self.update_list(listFrame)
+
+        if not load:
+        #Set page state to special passthrough variable (page has loaded, but has not yet reached its first commit)
+            controller.ws['C37'].value = 0.5
+        
+#------------------------------------------------------------------------
+
     def __init__(self, parent, controller, defaults):
         tk.Frame.__init__(self, parent)
-        global classList, varList, checkList, updateVar, c, r
+        global classList, varList, checkList, updateVar, c, r, listFrame
         c = r = pointer = 0
+        classList = []
+        varList = []
         
         #Create the frames for the window
         listFrame = tk.Frame(self)
@@ -144,19 +181,6 @@ class PageThree(tk.Frame):
         entryFrame.pack(side="left")
         submitFrame.pack(side="right")
         selectFrame.pack(side="left")
-        #Set up the class list
-        classList = defaults[0].split(", ")
-        #Create list to hold values of checkbuttons
-        varList = [tk.IntVar() for _ in range(len(classList))]
-
-        #Set up the list of classes for display
-        for name in classList:
-            tk.Checkbutton(listFrame, text=name, variable=varList[pointer]).grid(row=r, column=c)
-            c += 1
-            pointer += 1
-            if c > 4:
-                r += 1
-                c = 0
                 
         #The variable where the new class name is stored
         updateVar = tk.StringVar()
